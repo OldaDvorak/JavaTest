@@ -9,10 +9,33 @@ import java.util.List;
 @Repository
 public class MessageRepositoryImpl implements MessageRepository {
 
+    @Override
     public Message saveMessage(Message message) {
-        return null;
+        Connection con = null;
+        CallableStatement clstmt = null;
+        try {
+            con = DBConnection.getConnection();
+            clstmt = con.prepareCall("{call message_pckg.save_message(?, ?, ? )}");
+            clstmt.setString(1, message.getMessage());
+            clstmt.setString(2, message.getMessageSubject());
+            clstmt.setString(3, message.getMessageAuthor());
+            clstmt.registerOutParameter(1, Types.INTEGER);
+            clstmt.execute();
+            message.setMessageId(clstmt.getInt(1));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                clstmt.close();
+                con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return message;
     }
 
+    @Override
     public List<Message> getAllMessages() {
         Connection con = null;
         Statement stmt = null;
@@ -36,6 +59,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         return messageList;
     }
 
+    @Override
     public List<Message> getMessagesByAuthor(String author) {
         Connection con = null;
         PreparedStatement prstmt = null;
@@ -61,6 +85,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         return messageList;
     }
 
+    @Override
     public Message editMessage(Message message) throws SQLException {
         Connection con = null;
         CallableStatement clstmt = null;
@@ -81,6 +106,7 @@ public class MessageRepositoryImpl implements MessageRepository {
         return message;
     }
 
+    @Override
     public Message getMessageDetail(int messageId) {
         Connection con = null;
         PreparedStatement prstmt = null;
@@ -92,7 +118,6 @@ public class MessageRepositoryImpl implements MessageRepository {
             ResultSet rs = prstmt.executeQuery();
             rs.next();
             message = createMessageFromRow(rs);
-            return message;
         }  catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -104,6 +129,27 @@ public class MessageRepositoryImpl implements MessageRepository {
             }
         }
         return message;
+    }
+
+    @Override
+    public void deleteMessage(int messageId) {
+        Connection con = null;
+        CallableStatement clstmt = null;
+        try {
+            con = DBConnection.getConnection();
+            clstmt = con.prepareCall("{call message_pckg.delete_message( ? )}");
+            clstmt.setInt(1, messageId);
+            clstmt.executeQuery();
+        }  catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                clstmt.close();
+                con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private Message createMessageFromRow(ResultSet rs) throws SQLException {

@@ -15,4 +15,6 @@ public interface MessageRepository {
     Message getMessageDetail(int messageId);
 
     Message editMessage(Message message) throws SQLException;
+
+    void deleteMessage(int messageId);
 }
