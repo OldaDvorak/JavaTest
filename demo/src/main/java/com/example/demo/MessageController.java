@@ -25,7 +25,7 @@ public class MessageController {
         return ResponseEntity.ok(messagesService.getAllMessages());
     }
 
-    @RequestMapping(value = "/messages/{authorName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/messages/authors/{author}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<List<MessageDto>> getMessagesByAuthor(@PathVariable String author) {
         return ResponseEntity.ok(messagesService.getMessagesByAuthor(author));
