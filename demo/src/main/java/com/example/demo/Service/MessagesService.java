@@ -8,6 +8,9 @@ public interface MessagesService {
 
     MessageDto createMessage(MessageDto message);
 
+    /**Get all saved messages
+     * @return
+     */
     List<MessageDto> getAllMessages();
 
     List<MessageDto> getMessagesByAuthor(String author);
